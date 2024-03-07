@@ -1,0 +1,218 @@
+@page "/productivity/data"
+@using System.Globalization
+@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.Util
+@using Data
+@using System.Drawing
+@inject NavigationManager NavigationManager
+
+<div class="col">
+    <div class="row w-100 text-center">
+        <RadzenCard class="w-100 rz-background-color-base-200 rz-shadow-0 rz-border-radius-3">
+            <RadzenText TextStyle="TextStyle.DisplayH5" class="m-0">Dados Produtividade
+            </RadzenText>
+        </RadzenCard>
+    </div>
+    <div class="row w-100">
+        <RadzenDataGrid AllowFiltering="true" AllowMultiColumnSorting="true" AllowColumnResize="true"
+            AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="12"
+            AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            Data="@(DbMirror.main.pquestions as IEnumerable<ProductivityQuestions>)" TItem="ProductivityQuestions"
+            ColumnWidth="180px" LogicalFilterOperator="LogicalFilterOperator.Or">
+            <Columns>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title="Nome" Frozen="true"
+                TextAlign="TextAlign.Center" Width=120px >
+                    <Template Context="data">
+                        @DbMirror.main.GetNameByEmail(data.AuthorEmail)
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title="Semana" Frozen="true"
+                    TextAlign="TextAlign.Center" Width=150px>
+                    <Template Context="data">
+                        @data.week.ptbrName
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q1 Frozen="true" TextAlign="TextAlign.Left"
+                    Width=80px Sortable=true Property="Q1">
+                     <Template Context="data">
+                        @if(data.Q1 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q1</span>
+                        }
+                        else
+                        {
+                            @data.Q1
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q1</span>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q2 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q2">
+                    <Template Context="data">
+                        @if(data.Q2 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q2</span>
+                        }
+                        else
+                        {
+                            @data.Q2
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q2</span>
+                    </FooterTemplate></RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q3 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q3">
+                    <Template Context="data">
+                        @if(data.Q3 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q3</span>
+                        }
+                        else
+                        {
+                            @data.Q3
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q3</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q4 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q4">
+                    <Template Context="data">
+                        @if(data.Q4 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q4</span>
+                        }
+                        else
+                        {
+                            @data.Q4
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q4</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q5 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q5">
+                    <Template Context="data">
+                        @if(data.Q5 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q5</span>
+                        }
+                        else
+                        {
+                            @data.Q5
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q5</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q6 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q6">
+                    <Template Context="data">
+                        @if(data.Q6 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q6</span>
+                        }
+                        else
+                        {
+                            @data.Q6
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q6</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q7 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q7">
+                    <Template Context="data">
+                        @if(data.Q7 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q7</span>
+                        }
+                        else
+                        {
+                            @data.Q7
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q7</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q8 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q8">
+                    <Template Context="data">
+                        @if(data.Q8 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q8</span>
+                        }
+                        else
+                        {
+                            @data.Q8
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q8</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q9 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q9">
+                    <Template Context="data">
+                        @if(data.Q9 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q9</span>
+                        }
+                        else
+                        {
+                            @data.Q9
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q9</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title=Q10 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=80px Sortable=true Property="Q10">
+                    <Template Context="data">
+                        @if(data.Q10 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q10</span>
+                        }
+                        else
+                        {
+                            @data.Q10
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">Q10</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="ProductivityQuestions" Title="Porcentagem Final" Frozen="true"
+                    TextAlign="TextAlign.Center" Width=80px Property="FinalPercentProp">
+                    <Template Context="data">
+                        @if(data.FinalPercentProp <= 13)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.FinalPercentProp</span>
+                        }
+                        else
+                        {
+                            @data.FinalPercentProp
+                        }
+                     </Template>
+                    <FooterTemplate>
+                        <span style="color: var(--rz-text-color)">%</span>
+                    </FooterTemplate>
+                    </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+</div>

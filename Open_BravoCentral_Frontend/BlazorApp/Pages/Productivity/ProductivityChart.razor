@@ -1,0 +1,487 @@
+@page "/productivity/chart"
+
+@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart.Axes
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.RadarChart
+@using ChartJs.Blazor.Util
+@using Data
+@using System.Drawing
+
+<RadzenCard Class="rz-background-color-base-200 m-0 p-0">
+    <div class="col text-center">
+        <RadzenText class="m-0 p-2" TextStyle="TextStyle.DisplayH3">Gráficos: Produtividade</RadzenText>
+    </div>
+</RadzenCard>
+<RadzenTabs Change=@OnChange TabPosition="TabPosition.Top" Class="w-100 my-0 mx-0 mx-auto"
+    RenderMode="TabRenderMode.Client">
+    <Tabs>
+        <RadzenTabsItem Text="Produtividade e Quantidade De Commits">
+            <RadzenCard class="rz-shadow-3 rz-border-radius-3" style="width: 100%; height: 36rem;">
+                <div class="row text-center mx-auto" style="width: 68rem">
+                    <div class="col">
+                        <Chart Config="_config" @ref="_chart"></Chart>
+                    </div>
+                </div>
+            </RadzenCard>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Produtividade e Linhas de Código">
+            <RadzenCard class="rz-shadow-3 rz-border-radius-3" style="width: 100%; height: 36rem;">
+                <div class="row text-center mx-auto" style="width: 68rem">
+                    <div class="col">
+                        <Chart Config="_barConfig" @ref="_chart2"></Chart>
+                    </div>
+                </div>
+            </RadzenCard>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Produtividade Média por Pergunta">
+            <RadzenCard class="rz-shadow-3 rz-border-radius-3" style="width: 100%; height: 36rem;">
+                <div class="row text-center mx-auto" style="width: 68rem">
+                    <div class="col">
+                        <Chart Config="_radarConfig" @ref="_radarChart"></Chart>
+                    </div>
+                </div>
+            </RadzenCard>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+@code
+{
+    private Chart _chart;
+    private Chart _chart2;
+    private Chart _radarChart;
+    private LineConfig _config;
+    private BarConfig _barConfig;
+    private RadarConfig _radarConfig;
+    private bool changeLines = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _config = new LineConfig
+        {
+            Options = new LineOptions
+            {
+                SpanGaps = true,
+                Responsive = true,
+                Legend = new Legend
+                {
+                    Display = true,
+                    Position = Position.Right
+                },
+                Title = new OptionsTitle
+                {
+                    Display = false,
+                },
+                Scales = new Scales
+                {
+                    XAxes = new List<CartesianAxis>
+{
+new CategoryAxis
+{
+ScaleLabel = new ScaleLabel
+{
+LabelString = "Week"
+}
+}
+},
+                    YAxes = new List<CartesianAxis>
+{
+new LinearCartesianAxis
+{
+Ticks = new LinearCartesianTicks
+{
+Min = 0,
+Max = 120,
+StepSize = 20
+},
+ScaleLabel = new ScaleLabel
+{
+LabelString = "Value"
+}
+}
+}
+                }
+            }
+        };
+
+        _config.Data.Datasets.Clear();
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            _config.Data.Labels.Add(DbMirror.main.listWeeks[i].ptbrName);
+        }
+
+        foreach (User user in DbMirror.main.users)
+        {
+            _config.Data.Datasets.Add(CreatePeceptionPerWeek(user));
+        }
+        _config.Data.Datasets.Add(CreateAverage());
+        _config.Data.Datasets.Add(CreateMedian());
+        _config.Data.Datasets.Add(CreateCommitCountPerWeek());
+
+        foreach (User user in DbMirror.main.users)
+        {
+            _config.Data.Datasets.Add(CreateCommitCountPerWeekPerUser(user));
+        }
+
+        if (_chart != null)
+        {
+            _chart.Update();
+        }
+        ////
+
+        _barConfig = DbMirror.main.GetDefaultBarConfig();
+
+        _barConfig.Options.Scales.YAxes.Add(
+        (new LinearCartesianAxis
+        {
+            ID = "Alternative",
+            Position = Position.Right,
+            Ticks = new LinearCartesianTicks
+            {
+                BeginAtZero = true,
+                Max = 100,
+            }
+        })
+        );
+
+        _barConfig.Data.Datasets.Clear();
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            _barConfig.Data.Labels.Add(DbMirror.main.listWeeks[i].ptbrName);
+        }
+        foreach (User user in DbMirror.main.users)
+        {            
+            _barConfig.Data.Datasets.Add(CreatePeceptionAlternativePerWeek(user));
+            _barConfig.Data.Datasets.Add(DbMirror.main.CreateCommitAlterationsPerWeekPerUser(user));
+        }
+
+        CreateRadarChart();
+    }
+
+    public static ProductivityQuestions GetWeekQuestions(int week, User user)
+    {
+        if (DbMirror.main.pquestions == null || DbMirror.main.pquestions.Count == 0)
+        {
+            return null;
+        }
+
+        List<ProductivityQuestions> filteredListOFQuestionByUser = DbMirror.main.pquestions.Where(x => x.authorEmail ==
+        user.email).ToList();
+
+        if (filteredListOFQuestionByUser.Count == 0) return null;
+
+        ProductivityQuestions correctProductivityQuestion = filteredListOFQuestionByUser.FirstOrDefault(x => x.week.name ==
+        DbMirror.main.listWeeks[week].name);
+
+        return correctProductivityQuestion;
+    }
+
+    public static LineDataset<float> CreatePeceptionPerWeek(User user)
+    {
+        LineDataset<float> dataset = new LineDataset<float>()
+        {
+            Label =  $"PROD Total: {user.displayName}",
+            BackgroundColor = ColorUtil.FromDrawingColor(user.colorSecundary),
+            BorderColor = ColorUtil.FromDrawingColor(user.colorPrimary),
+            Fill = FillingMode.Disabled,
+        };
+
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            ProductivityQuestions q = GetWeekQuestions(i, user);
+            if (q != null)
+            {
+                dataset.Add(q.FinalPercent());
+            }
+            else
+            {
+                dataset.Add(float.NaN);
+            }
+        }
+
+        return dataset;
+    }
+
+    public static LineDataset<float> CreatePeceptionDashedPerWeek(User user)
+    {
+        LineDataset<float> dataset = new LineDataset<float>()
+        {
+            Label =  $"PROD Total: {user.displayName}",
+            BackgroundColor = ColorUtil.FromDrawingColor(user.colorSecundary),
+            BorderColor = ColorUtil.FromDrawingColor(user.colorPrimary),
+            Fill = FillingMode.Disabled,
+            BorderDash = new int[2] { 6, 12 }
+        };
+
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            ProductivityQuestions q = GetWeekQuestions(i, user);
+            if (q != null)
+            {
+                dataset.Add(q.FinalPercent());
+            }
+            else
+            {
+                dataset.Add(float.NaN);
+            }
+        }
+
+        return dataset;
+    }
+
+    private LineDataset<float> CreatePeceptionAlternativePerWeek(User user)
+    {
+        LineDataset<float> dataset = new LineDataset<float>()
+        {
+            Label = $"PROD Total: {user.displayName}",
+            BackgroundColor = ColorUtil.FromDrawingColor(user.colorSecundary),
+            BorderColor = ColorUtil.FromDrawingColor(user.colorPrimary),
+            Fill = FillingMode.Disabled,
+            YAxisId = "Alternative"
+        };
+
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            ProductivityQuestions q = GetWeekQuestions(i, user);
+            if (q != null)
+            {
+                dataset.Add(q.FinalPercent());
+            }
+            else
+            {
+                dataset.Add(float.NaN);
+            }
+        }
+
+        return dataset;
+    }
+
+
+    private IDataset<float> CreateAverage()
+    {
+        IDataset<float> dataset = new LineDataset<float>()
+        {
+            Label = "Média",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.Black),
+            BorderColor = ColorUtil.FromDrawingColor(Color.Black),
+            Fill = FillingMode.Disabled,
+            BorderDash = new int[2] { 5, 15 }
+        };
+
+        
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            float average = 0;
+            int countWorkingThatWeek = 0;
+            foreach (var user in DbMirror.main.users)
+            {
+                ProductivityQuestions q = GetWeekQuestions(i, user);
+                if (q != null)
+                {
+                    average += q.FinalPercent();
+                    countWorkingThatWeek += 1;
+                }
+                else average += 0;
+
+            }
+            if (average > 0)
+            {
+                dataset.Add(average / countWorkingThatWeek);
+            }
+        }
+
+        return dataset;
+    }
+
+    private IDataset<float> CreateMedian()
+    {
+        IDataset<float> dataset = new LineDataset<float>()
+        {
+            Label = "Mediana",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.Gray),
+            BorderColor = ColorUtil.FromDrawingColor(Color.DimGray),
+            Fill = FillingMode.Disabled,
+            BorderDash = new int[2] { 3, 6 }
+        };
+        List<float> floatList = new List<float>();
+
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            floatList.Clear();
+            foreach (var user in DbMirror.main.users)
+            {
+                ProductivityQuestions q = GetWeekQuestions(i, user);
+                if (q != null)
+                {
+                    floatList.Add(q.FinalPercent());
+                }
+            }
+            if (floatList.Count > 0)
+            {
+                dataset.Add(Utils.GetMedian<float>(floatList.ToArray()));
+            }
+        }
+
+        return dataset;
+    }
+
+    private LineDataset<int> CreateCommitCountPerWeek()
+    {
+        LineDataset<int> dataset = new LineDataset<int>()
+        {
+            Label = "Qtd Commits",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.BlanchedAlmond),
+            BorderColor = ColorUtil.FromDrawingColor(Color.YellowGreen),
+            Fill = FillingMode.Disabled,
+            BorderDash = new int[2] { 1, 3 }
+        };
+
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            dataset.Add(DbMirror.main.CountCommitsWeek(i));
+        }
+        return dataset;
+    }
+
+    private LineDataset<int> CreateCommitCountPerWeekPerUser(User user)
+    {
+        LineDataset<int> dataset = new LineDataset<int>()
+        {
+            Label = $"Qtd Commits: {user.ShortName}",
+            BorderColor = ColorUtil.FromDrawingColor(user.colorPrimary),
+            BackgroundColor = ColorUtil.FromDrawingColor(user.colorSecundary),
+            Fill = FillingMode.Disabled,
+            BorderDash = new int[2] { 1, 3 },
+        };
+
+
+        for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+        {
+            dataset.Add(DbMirror.main.CountCommitsWeekPerUser(i, user));
+        }
+        return dataset;
+    }
+
+    protected void ChangeLines()
+    {
+        changeLines = !changeLines;
+        @* _config.Options.ShowLines = changeLines; *@
+        for (int i = 0; i < _config.Data.Datasets.Count; i++)
+        {
+            var data = (LineDataset<float>)_config.Data.Datasets[i];
+            if (data.Label != "Mediana" && data.Label != "Média")
+            {
+                data.ShowLine = changeLines;
+            }
+        }
+
+        _chart.Update();
+    }
+
+    void OnChange()
+    {
+        _chart.Update();
+    }
+
+    protected void CreateRadarChart()
+    {
+        ///
+        _radarConfig = new RadarConfig();
+        for (int i = 0; i < 10; i++)
+        {
+            _radarConfig.Data.Labels.Add($"Q{i + 1}");
+        }
+        _radarConfig.Options = new RadarOptions
+        {
+            Legend = new Legend
+            {
+                Display = true,
+                Position = Position.Right
+            }
+        };
+        _radarConfig.Options.Scale = new LinearRadialAxis
+        {
+            Ticks = new LinearRadialTicks
+            {
+                BeginAtZero = true,
+                Max = 5
+            }
+        };
+        CreateDatasetAveragePerquestion();
+
+        void CreateDatasetAveragePerquestion()
+        {
+            var radarDatasetQuestions = new RadarDataset<float>();
+            radarDatasetQuestions.Label = "Media por Pergunta";
+            radarDatasetQuestions.BorderColor = ColorUtil.FromDrawingColor(Color.Black);
+
+            float sumQuestionValues = 0;
+            int totalCountQuestionSum = 0;
+            for (int q = 0; q < 10; q++)
+            {
+                sumQuestionValues = 0;
+                totalCountQuestionSum = 0;
+                for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+                {
+                    var questionsperweek = DbMirror.main.pquestions.Where(questions => questions.week.name ==
+                    DbMirror.main.listWeeks[i].name).ToList();
+                    for (int c = 0; c < questionsperweek.Count; c++)
+                    {
+                        var singlequestion = questionsperweek[c];
+                        // Get a single question object
+                        sumQuestionValues += singlequestion.questions[q].value;
+                        totalCountQuestionSum += 1;
+                    }
+                }
+                radarDatasetQuestions.Add(sumQuestionValues / totalCountQuestionSum);
+            }
+            _radarConfig.Data.Datasets.Add(radarDatasetQuestions);
+        }
+
+        foreach (User user in DbMirror.main.users)
+        {
+            CreateDatasetAveragePerPersonPerQuestion(user);
+        }
+
+        void CreateDatasetAveragePerPersonPerQuestion(User user)
+        {
+            var radarDatasetQuestions = new RadarDataset<float>();
+            radarDatasetQuestions.Label = $"Media por Pergunta {user.ShortName}";
+            radarDatasetQuestions.BorderColor = ColorUtil.FromDrawingColor(user.colorPrimary);
+
+            float sumQuestionValues = 0;
+            int totalCountQuestionSum = 0;
+            for (int q = 0; q < 10; q++)
+            {
+                sumQuestionValues = 0;
+                totalCountQuestionSum = 0;
+                for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+                {
+                    var questionsperweek = DbMirror.main.pquestions.Where(questions => questions.week.name ==
+                    DbMirror.main.listWeeks[i].name && questions.authorEmail == user.email).ToList();
+                    for (int c = 0; c < questionsperweek.Count; c++)
+                    {
+                        var singlequestion = questionsperweek[c];
+                        // Get a single question object
+                        sumQuestionValues += singlequestion.questions[q].value;
+                        totalCountQuestionSum += 1;
+                    }
+                }
+                radarDatasetQuestions.Add(sumQuestionValues / totalCountQuestionSum);
+            }
+            _radarConfig.Data.Datasets.Add(radarDatasetQuestions);            
+        }
+
+
+        if (_radarChart != null)
+        {
+            _radarChart.Update();
+        }
+    }
+}

@@ -1,0 +1,251 @@
+@page "/who5/questions/{week:int}"
+@using Data
+@using Newtonsoft.Json
+@using RestSharp;
+@using System.Net.Http
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+
+<RadzenCard Class="rz-background-color-base-200">
+    <div class="col text-center">
+        <RadzenText TextStyle="TextStyle.DisplayH3" style="font-variant:small-caps;">Questionário Saúde Mental</RadzenText>
+        <RadzenText class="mt-0 mb-0" TextStyle="TextStyle.DisplayH5">@DbMirror.main.listWeeks[week].ptbrName</RadzenText>
+        <RadzenText class="mt-0 mb-0" TextStyle="TextStyle.Overline">@DbMirror.main.listWeeks[week].startEndString
+        </RadzenText>
+    </div>
+</RadzenCard>
+
+
+@if (!isSending)
+{
+    <RadzenCard Class="w-100">
+        <div class="row">
+            <div class="col-5">
+                <RadzenText>Durante essa semana...</RadzenText>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <RadzenText>Nunca</RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenText>Algumas Vezes</RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenText>Menos da metade do tempo</RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenText>Mais da metade do tempo</RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenText>Na maior parte do tempo</RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenText>O tempo todo</RadzenText>
+                    </div>
+                    <div class="col-1">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </RadzenCard>
+    Question q0 = allwhoquestions.questions[0];
+    <RadzenCard Class="w-100">
+        <div class="row">
+            <div class="col-5">
+                <RadzenText TextStyle="TextStyle.Body1">@DbMirror.main.listQuestionText[0]</RadzenText>
+            </div>
+            <div class="col">
+                <RadzenRadioButtonList @bind-Value=@q0.value TValue="int" TextProperty="bnla">
+                    <Items>
+                        <RadzenRadioButtonListItem Text="0" Value="0" TValue="int" />
+                        <RadzenRadioButtonListItem Text="1" Value="1" TValue="int" />
+                        <RadzenRadioButtonListItem Text="2" Value="2" TValue="int" />
+                        <RadzenRadioButtonListItem Text="3" Value="3" TValue="int" />
+                        <RadzenRadioButtonListItem Text="4" Value="4" TValue="int" />
+                        <RadzenRadioButtonListItem Text="5" Value="5" TValue="int" />
+                    </Items>
+                </RadzenRadioButtonList>
+            </div>
+        </div>
+    </RadzenCard>
+    Question q1 = allwhoquestions.questions[1];
+    <RadzenCard Class="w-100">
+        <div class="row">
+            <div class="col-5">
+                <RadzenText TextStyle="TextStyle.Body1">@DbMirror.main.listQuestionText[1]</RadzenText>
+            </div>
+            <div class="col">
+                <RadzenRadioButtonList @bind-Value=@q1.value TValue="int">
+                    <Items>
+                        <RadzenRadioButtonListItem Text="0" Value="0" TValue="int" />
+                        <RadzenRadioButtonListItem Text="1" Value="1" TValue="int" />
+                        <RadzenRadioButtonListItem Text="2" Value="2" TValue="int" />
+                        <RadzenRadioButtonListItem Text="3" Value="3" TValue="int" />
+                        <RadzenRadioButtonListItem Text="4" Value="4" TValue="int" />
+                        <RadzenRadioButtonListItem Text="5" Value="5" TValue="int" />
+                    </Items>
+                </RadzenRadioButtonList>
+            </div>
+        </div>
+    </RadzenCard>
+    Question q2 = allwhoquestions.questions[2];
+    <RadzenCard Class="w-100">
+        <div class="row">
+            <div class="col-5">
+                <RadzenText TextStyle="TextStyle.Body1">@DbMirror.main.listQuestionText[2]</RadzenText>
+            </div>
+            <div class="col">
+                <RadzenRadioButtonList @bind-Value=@q2.value TValue="int">
+                    <Items>
+                        <RadzenRadioButtonListItem Text="0" Value="0" TValue="int" />
+                        <RadzenRadioButtonListItem Text="1" Value="1" TValue="int" />
+                        <RadzenRadioButtonListItem Text="2" Value="2" TValue="int" />
+                        <RadzenRadioButtonListItem Text="3" Value="3" TValue="int" />
+                        <RadzenRadioButtonListItem Text="4" Value="4" TValue="int" />
+                        <RadzenRadioButtonListItem Text="5" Value="5" TValue="int" />
+                    </Items>
+                </RadzenRadioButtonList>
+            </div>
+        </div>
+    </RadzenCard>
+    Question q3 = allwhoquestions.questions[3];
+    <RadzenCard Class="w-100">
+        <div class="row">
+            <div class="col-5">
+                <RadzenText TextStyle="TextStyle.Body1">@DbMirror.main.listQuestionText[3]</RadzenText>
+            </div>
+            <div class="col">
+                <RadzenRadioButtonList @bind-Value=@q3.value TValue="int">
+                    <Items>
+                        <RadzenRadioButtonListItem Text="0" Value="0" TValue="int" />
+                        <RadzenRadioButtonListItem Text="1" Value="1" TValue="int" />
+                        <RadzenRadioButtonListItem Text="2" Value="2" TValue="int" />
+                        <RadzenRadioButtonListItem Text="3" Value="3" TValue="int" />
+                        <RadzenRadioButtonListItem Text="4" Value="4" TValue="int" />
+                        <RadzenRadioButtonListItem Text="5" Value="5" TValue="int" />
+                    </Items>
+                </RadzenRadioButtonList>
+            </div>
+        </div>
+    </RadzenCard>
+    Question q5 = allwhoquestions.questions[4];
+    <RadzenCard Class="w-100">
+        <div class="row">
+            <div class="col-5">
+                <RadzenText TextStyle="TextStyle.Body1">@DbMirror.main.listQuestionText[4]</RadzenText>
+            </div>
+            <div class="col">
+                <RadzenRadioButtonList @bind-Value=@q5.value TValue="int">
+                    <Items>
+                        <RadzenRadioButtonListItem Text="0" Value="0" TValue="int" />
+                        <RadzenRadioButtonListItem Text="1" Value="1" TValue="int" />
+                        <RadzenRadioButtonListItem Text="2" Value="2" TValue="int" />
+                        <RadzenRadioButtonListItem Text="3" Value="3" TValue="int" />
+                        <RadzenRadioButtonListItem Text="4" Value="4" TValue="int" />
+                        <RadzenRadioButtonListItem Text="5" Value="5" TValue="int" />
+                    </Items>
+                </RadzenRadioButtonList>
+            </div>
+        </div>
+    </RadzenCard>
+    <RadzenCard>
+        <div class="row">
+            <div class="col w-50 text-center">
+                <RadzenButton class="ml-4.mx-auto" Shade="Shade.Darker" Click=@(args => OnClickStats()) Text="Voltar"
+                ButtonStyle="ButtonStyle.Dark" />
+            </div>
+            <div class="col w-50 text-center">
+                <RadzenButton class="ml-4" Disabled=@(!allwhoquestions.CheckQuestions()) Shade="Shade.Darker" Click=@(args
+                => OnClickSubmit()) Text="Enviar" ButtonStyle="ButtonStyle.Dark" />
+            </div>
+        </div>
+    </RadzenCard>
+}
+else
+{
+    <RadzenCard Class="rz-background-color-base-200">
+        <div class="col text-center">
+            <RadzenText TextStyle="TextStyle.DisplayH3">Enviando</RadzenText>
+        </div>
+    </RadzenCard>
+}
+
+
+@code {
+
+    private WhoQuestions allwhoquestions = new WhoQuestions();
+    [Parameter]
+    public int week { get; set; }
+
+    private bool isSending = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        allwhoquestions.questions = new List<Question>(5);
+        for (int i = 0; i < 5; i++)
+        {
+            var q = new Question();
+            q.value = -1;
+            allwhoquestions.questions.Add(q);
+        }
+    }
+
+    private async void OnClickSubmit()
+    {
+        //TODO Block if no current user
+        allwhoquestions.week = DbMirror.main.listWeeks[week];
+        allwhoquestions.authorEmail = DbMirror.main.currentUser.email;
+        for (int i = 0; i < allwhoquestions.questions.Count; i++)
+        {
+            if (allwhoquestions.questions[i].value == -1)
+            {
+                //TODO ERROR
+                return;
+            }
+        }
+        string baseURI = $"{DbMirror.main.serveruri}/mentalhealth/who5";
+        var client = new RestClient(baseURI);
+        var request = new RestRequest()
+        .AddQueryParameter("date", DateTime.Now.ToUniversalIso8601().ToString())
+        .AddStringBody(JsonConvert.SerializeObject(allwhoquestions), DataFormat.Json);
+
+        try
+        {
+            isSending = true;
+            var res = await client.PostAsync(request);
+            if (res.StatusCode == System.Net.HttpStatusCode.Accepted)
+            {
+                Utils.Log(res.StatusCode);
+                Utils.Log(res.Content);
+            }
+        }
+        catch (System.Net.Http.HttpRequestException e)
+        {
+            isSending = false;
+            Utils.Log("ERROR: " + e.Message);
+            StateHasChanged();
+        }
+        finally
+        {
+            isSending = false;
+            StateHasChanged();
+        }
+    }
+
+    private async void OnClickStats()
+    {
+        try
+        {
+            await DbMirror.main.GetWhoQuestionsFromDB();
+            NavigationManager.NavigateTo("/who5/main");
+        }
+        catch (Exception e)
+        {
+            Utils.Log(e.Message);
+            NavigationManager.NavigateTo("/who5/main");
+        }
+    }
+}

@@ -1,0 +1,89 @@
+@page "/productivity/main"
+@using System.Globalization
+@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.Util
+@using Data
+@using System.Drawing
+@inject NavigationManager NavigationManager
+
+@for (int i = 0; i < 3; i++)
+{
+    <div class="row">
+        @for (int j = 0; j < maxPerLine; j++)
+        {
+            int index = i * maxPerLine + j;
+            if (index < DbMirror.main.listWeeks.Count)
+            {
+                var pquestions = GetWeekQuestions(index, DbMirror.main.currentUser);
+                if (pquestions != null)
+                {
+                    <ProductivityCard pquestion=@pquestions></ProductivityCard>
+                }
+                else
+                {                
+                    <RadzenCard Class="m-3" style="width: 15rem;">
+                        <div class="d-flex flex-row p-3 mb-0">
+                            <div>
+                                <RadzenText TextStyle="TextStyle.DisplayH6"><b>@DbMirror.main.listWeeks[index].ptbrName</b>
+                                </RadzenText>
+                                <RadzenText TextStyle="TextStyle.Caption" Class="d-flex mt-0 mb-0">
+                                    @DbMirror.main.listWeeks[index].startEndString
+                                </RadzenText>
+                            </div>
+                        </div>
+                        <RadzenCard Class="my-4 rz-background-color-base-200 rz-shadow-0 rz-border-radius-3"
+            style="margin: 0 calc(-1 * var(--rz-card-padding)); padding: 2rem;">
+                                <RadzenButton class="ml-4" Shade="Shade.Darker" Click=@(args => OnClickStats(index)) Text="Preencher"
+                    ButtonStyle="ButtonStyle.Dark" />
+                        </RadzenCard>
+                    </RadzenCard>
+                }
+
+            }
+        }
+    </div>
+}
+
+@code {
+
+    public List<Week> listWeeks => DbMirror.main.listWeeks;
+    private int maxPerLine = 4;
+
+    protected ProductivityQuestions GetWeekQuestions(int week, User user)
+    {
+        if (DbMirror.main.pquestions == null || DbMirror.main.pquestions.Count == 0)
+        {
+            return null;
+        }
+
+        List<ProductivityQuestions> filteredListOFQuestionByUser = DbMirror.main.pquestions.Where(x => x.authorEmail ==
+        user.email).ToList();
+
+        if (filteredListOFQuestionByUser.Count == 0) return null;
+
+        ProductivityQuestions correctProductivityQuestion = filteredListOFQuestionByUser.FirstOrDefault(x => x.week.name == DbMirror.main.listWeeks[week].name);
+
+        return correctProductivityQuestion;
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        if(DbMirror.main.pquestions.Count == 0)
+        {
+            await DbMirror.main.GetProductivityQuestionsFromDB();
+        }        
+    }
+
+    private void OnClickStats(int week)
+    {
+        Utils.Log($"Going to /productivity/questions/{week}");
+        NavigationManager.NavigateTo($"/productivity/questions/{week}");
+    }
+}

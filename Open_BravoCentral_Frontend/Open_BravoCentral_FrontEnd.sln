@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BravoCentral", "BlazorApp\BravoCentral.csproj", "{8DF3CABB-DD4A-4309-9F3F-1804F7F5596D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DF3CABB-DD4A-4309-9F3F-1804F7F5596D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DF3CABB-DD4A-4309-9F3F-1804F7F5596D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DF3CABB-DD4A-4309-9F3F-1804F7F5596D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DF3CABB-DD4A-4309-9F3F-1804F7F5596D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {68B80A0E-2E9B-48BF-9C71-56DA0AB34756}
+	EndGlobalSection
+EndGlobal

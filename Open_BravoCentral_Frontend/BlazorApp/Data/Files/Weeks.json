@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Week 1 September",
+    "dayStart": "2022-08-29T00:00:00",
+    "dayEnd": "2022-09-04T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 2 September",
+    "dayStart": "2022-09-05T00:00:00",
+    "dayEnd": "2022-09-11T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 3 September",
+    "dayStart": "2022-09-12T00:00:00",
+    "dayEnd": "2022-09-18T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 4 September",
+    "dayStart": "2022-09-19T00:00:00",
+    "dayEnd": "2022-09-25T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 5 September",
+    "dayStart": "2022-09-26T00:00:00",
+    "dayEnd": "2022-10-02T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 1 October",
+    "dayStart": "2022-10-03T00:00:00",
+    "dayEnd": "2022-10-09T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 2 October",
+    "dayStart": "2022-10-10T00:00:00",
+    "dayEnd": "2022-10-16T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 3 October",
+    "dayStart": "2022-10-17T00:00:00",
+    "dayEnd": "2022-10-23T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 4 October",
+    "dayStart": "2022-10-24T00:00:00",
+    "dayEnd": "2022-10-30T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 1 November",
+    "dayStart": "2022-10-31T00:00:00",
+    "dayEnd": "2022-11-6T00:00:00",
+    "isVacation": false
+  },
+  {
+    "name": "Week 2 November",
+    "dayStart": "2022-11-07T00:00:00",
+    "dayEnd": "2022-11-13T00:00:00",
+    "isVacation": false
+  }
+]

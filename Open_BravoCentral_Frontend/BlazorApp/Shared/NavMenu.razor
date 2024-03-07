@@ -1,0 +1,80 @@
+﻿@using Data
+
+<div class="sidebar">
+    <div class="top-row pl-1 border-right border-dark" id="sticky-sidebar">
+        <div class="row w-100 ">
+            <div class="col mx-auto">
+                <RadzenImage class="m-0 p-0" Path="Images\Tipografia_Colorido_FundoTransparente.png"
+                    Style="width: 300px; position: relative; left: -30px;" />
+                @* <RadzenText class="m-0 p-0" Style="position: relative; top: -50px;"TextAlign="TextAlign.Center"
+                    TextStyle="TextStyle.DisplayH5">Bravo Central</RadzenText> *@
+            </div>
+        </div>
+    </div>
+    <div class="container h-100 p-0 border-right border-top border-left-0 border-bottom-0 border-dark rz-shadow-3"
+        id="sticky-sidebar">
+        @if (DbMirror.main.Initialized)
+        {
+            <RadzenPanelMenu Style="fit-content">
+                <RadzenPanelMenuItem Text="Principal" Path="/" Icon="home"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Usuários" Path="users" Icon="account_circle"></RadzenPanelMenuItem>
+                @if (DbMirror.main.currentUser != null && DbMirror.main.currentUser.name != "temp")
+                {
+                    <RadzenPanelMenuItem Text="Saúde Mental" Icon="favorite">
+                        <RadzenPanelMenuItem Text="Calendário" Path="who5/main" Icon="calendar_month"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Visualização" Path="who5/chart" Icon="show_chart"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Dados" Path="who5/data" Icon="dns"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Produtividade" Icon="assignment">
+                        <RadzenPanelMenuItem Text="Calendário" Path="productivity/main" Icon="calendar_month">
+                        </RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Commits" Path="productivity/commits" Icon="assessment"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Visualização" Path="/productivity/chart" Icon="show_chart">
+                        </RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Dados" Path="productivity/data" Icon="dns"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Social" Icon="account_box">
+                        <RadzenPanelMenuItem Text="Rituais" Path="/social/rituals" Icon="tab" />
+                        <RadzenPanelMenuItem Text="Visualização" Path="/social/chart" Icon="show_chart"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Mais">
+                        <RadzenPanelMenuItem Text="Log" Path="/log" Icon="logo_dev" />
+                        <a/>
+                        <div class="text-center">
+                            <RadzenButton class="my-4 mx-auto" Click=@(() => DbMirror.ForceUpdateDB())>Atualizar BD</RadzenButton>
+                        </div>
+                    </RadzenPanelMenuItem>
+                }   
+            </RadzenPanelMenu>
+        }
+        else
+        {
+            <RadzenPanelMenu class="m-2 px-2" Style="fit-content">
+                <RadzenText> CARREGANDO..</RadzenText>
+            </RadzenPanelMenu>
+        }
+    </div>
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        DbMirror.main.changedUser +=
+        () => OnChanged();
+
+        DbMirror.main.initalizedAction +=
+        () => OnChanged();
+
+        Utils.Log($"NAV MENU LOAD {DbMirror.main.initalizedAction.ToString()}");
+    }
+
+    public async void OnChanged()
+    {
+        await InvokeAsync(() =>
+        {
+            Utils.Log("State has change updating navmenu");
+            StateHasChanged();
+        });
+    }
+}

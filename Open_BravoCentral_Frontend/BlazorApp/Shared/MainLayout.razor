@@ -1,0 +1,39 @@
+﻿@inherits LayoutComponentBase
+@using Data
+
+<div>
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row px-10 mx-10">
+        @if (DbMirror.main != null && DbMirror.main.currentUser != null && DbMirror.main.currentUser.name != "temp")
+        {
+            <RadzenText class= "p-0 m-0" TextStyle="TextStyle.DisplayH5">@DbMirror.main.currentUser.displayName</RadzenText>
+            <a></a>
+        }
+    </div>
+
+    <div class="content m-0 px-0 py-0 p-0">
+        @Body
+    </div>
+</div>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        if (DbMirror.main == null || !DbMirror.main.Initialized) DbMirror.Initialize();
+
+        DbMirror.main.changedUser +=
+        () => OnChanged();
+    }
+    public async void OnChanged()
+    {
+        await InvokeAsync(() =>
+        {
+            Utils.Log("State has change updating main layout");
+            StateHasChanged();
+        });
+    }
+}

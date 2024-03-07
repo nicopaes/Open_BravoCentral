@@ -1,0 +1,64 @@
+@page "/social/rituals"
+@using System.Globalization
+@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.Util
+@using Data
+@using System.Drawing
+@inject NavigationManager NavigationManager
+
+<div class="container">
+    <div class="row py-0 px-0">
+        <div class="col">
+            <RadzenCard>
+                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@DbMirror.main.rituals" TItem="Ritual"
+                    PageSize="4" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+                    <Template Context="ritual">
+                        <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
+                            <div class="container">
+                                <div class="row"
+                                    style="margin-left: calc(var(--bs-gutter-x) * -1); margin-right: calc(var(--bs-gutter-x) * -1)">
+                                    <div class="col-lg-12  p-3">
+                                        <div class="row d-flex">
+                                            <div class="col-md-6 col-lg-3">
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5"
+                                                    Class="rz-color-warning-dark">@(ritual.ritualType)</RadzenText>
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5"
+                                                    Class="rz-color-info-dark">@(ritual.date)</RadzenText>
+                                            </div>
+                                            <div class="col-md-6 col-lg-4">
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">
+                                                    Autor</RadzenText>
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">
+                                                    @(ritual.author)</RadzenText>
+                                            </div>
+                                            <div class="col-md-6 col-lg-4">
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">
+                                                    Message</RadzenText>
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">
+                                                    @(ritual.message)</RadzenText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        await DbMirror.main.GetCommitsFromDB();
+    }
+}

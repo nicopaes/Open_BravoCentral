@@ -1,0 +1,126 @@
+@page "/productivity/commits"
+@using System.Globalization
+@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.Util
+@using Data
+@using System.Drawing
+@inject NavigationManager NavigationManager
+
+<div class="container">
+    <div class="row py-0 px-0">
+        <div class="col">
+            <RadzenCard>
+                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@DbMirror.main.commits" TItem="Commit"
+                    PageSize="4" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+                    <Template Context="commit">
+                        <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
+                            <div class="container">
+                                <div class="row"
+                                    style="margin-left: calc(var(--bs-gutter-x) * -1); margin-right: calc(var(--bs-gutter-x) * -1)">
+                                    <div class="col-lg-12  p-3">
+                                        <div class="row d-flex">
+                                            <div class="col-md-6 col-lg-2">
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5"
+                                                    Class="rz-color-warning-dark">@(commit.ShortId)</RadzenText>
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5"
+                                                    Class="rz-color-info-dark">@(commit.CommitedDate)</RadzenText>
+                                            </div>
+                                            <div class="col-md-6 col-lg-2">
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">
+                                                    Autor</RadzenText>
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">
+                                                    @(DbMirror.main.GetNameByEmail(commit.CommiterEmail))
+                                                    </RadzenText>
+                                            </div>
+                                            <div class="col-md-6 col-lg-3">
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">
+                                                    Título</RadzenText>
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">
+                                                    @(commit.Title)</RadzenText>
+                                            </div>
+                                            <div class="col-md-6 col-lg-3 mx-0">
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">
+                                                    Mensagem</RadzenText>
+                                                <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">
+                                                    @(commit.Message)</RadzenText>
+                                            </div>
+                                            <div class="col-md-1 order-first order-lg-last col-lg-2 px-1">
+                                                <div class="col mx-0 px-0">
+                                                    <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.H6" TagName="TagName.H5"
+                                                        class="mb-0">
+                                                        Status</RadzenText>
+                                                    <div class="row m-0 p-0">
+                                                        <div class="col mx-1 px-0">
+                                                            <div class="row align-items-center">                                                                
+                                                                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Dark"
+                                                            Class="price-badge" Text="Adições" />
+                                                            </div>
+                                                            <div class="row align-items-center">
+                                                                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Dark"
+                                                            Class="price-badge" Text="Deleções" />
+                                                            </div>
+                                                            <div class="row align-items-center">
+                                                                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Dark"
+                                                            Class="price-badge" Text="Total" />
+                                                            </div>                                                        
+                                                        </div>
+                                                        <div class="col p-0">
+                                                            <div class="row mx-2 align-items-end">
+                                                                <RadzenBadge BadgeStyle="BadgeStyle.Success"
+                                                                    Shade="Shade.Lighter" Class="price-badge"
+                                                                    Text=@($"{commit.Stats.Additions}") />
+                                                            </div>
+                                                            <div class="row mx-2 align-items-end">
+                                                                <RadzenBadge BadgeStyle="BadgeStyle.Danger"
+                                                                    Shade="Shade.Lighter" Class="price-badge"
+                                                                    Text=@($"{commit.Stats.Deletions}") />
+                                                            </div>
+                                                            <div class="row mx-2 align-items-end">
+                                                                <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter"
+                                                                            Class="price-badge" Text=@($"{commit.Stats.Total}") />
+                                                            </div>                                                        
+                                                        </div>
+                                                        <div class="col p-0">
+                                                            <div class="row mx-2 align-items-center">
+                                                                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Success"
+                                                                    Shade="Shade.Dark" Class="price-badge"
+                                                                    Text=@($"{commit.CodeStats.Additions}") />
+                                                            </div>
+                                                            <div class="row mx-2 align-items-center">
+                                                                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Danger"
+                                                                    Shade="Shade.Dark" Class="price-badge"
+                                                                    Text=@($"{commit.CodeStats.Deletions}") />
+                                                            </div>
+                                                            <div class="row mx-2 align-items-center">
+                                                                <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Info" Shade="Shade.Dark"
+                                                                            Class="price-badge" Text=@($"{commit.CodeStats.Total}") />
+                                                            </div>                                                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        await DbMirror.main.GetCommitsFromDB();
+    }
+}

@@ -1,0 +1,45 @@
+@page "/users"
+@using Data
+
+@if (DbMirror.main.users != null && DbMirror.main.users.Count != 0)
+{
+    @if (DbMirror.main.currentUser != null)
+    {
+        <RadzenCard Class="m-4">
+            <RadzenText TextStyle="TextStyle.DisplayH6" class="m-0">Usuário Atual: @DbMirror.main.currentUser.displayName</RadzenText>
+        </RadzenCard>
+    }
+//TODO Rows
+    @for (int i = 0; i < 2; i++)
+    {
+        <div class="row m-3">
+            @for (int j = 0; j < 3; j++)
+            {
+                User user = DbMirror.main.users[3 * i + j];
+                <RadzenCard Class="m-1" style="width: 20rem;">
+                    <div class="text-center">
+                        <RadzenText TextStyle="TextStyle.DisplayH4" class="m-0">@user.displayName</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Caption" class="mt-0 pb-6">Email: *****************@user.email.Split('@')[1]</RadzenText>
+                        <RadzenButton class="mt-4" Shade="Shade.Darker" Click=@(args => OnClickSelectUser(user.email))
+                Text="Escolher" ButtonStyle="ButtonStyle.Dark" />
+                    </div>
+                </RadzenCard>
+            }
+        </div>
+    }
+}
+else
+{
+    <h2>Loading...</h2>
+}
+
+@code
+{
+    protected void OnClickSelectUser(string useremail)
+    {
+        if (DbMirror.main.SelectUser(useremail))
+        {
+            Utils.Log($"Succesfully changed to {useremail}");
+        }
+    }
+}

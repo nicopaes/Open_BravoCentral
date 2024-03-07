@@ -1,0 +1,325 @@
+﻿@page "/"
+@using BravoCentral.Data
+@using ChartJs.Blazor
+@using ChartJs.Blazor.RadarChart
+@using ChartJs.Blazor.BarChart.Axes
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.Util
+@using System.Drawing
+
+<div class="w-100 h-100">
+    <RadzenCard class="w-100 text-center">
+        <RadzenText TextStyle="TextStyle.Subtitle2">Bem vindo ao Bravo Central -  V1.0</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2">Hoje é @DateTime.Now.ToShortDateString()</RadzenText>
+    </RadzenCard>
+    @if (DbMirror.main.Initialized)
+    {
+        <div class="row mx-auto">
+            <RadzenCard Class="m-3 text-center" style="width: 25rem; height: 20rem;">
+                <RadzenText TextStyle="TextStyle.DisplayH6">Média Saúde Mental</RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption">Última semana: @lastWeek.startEndString</RadzenText>
+                <RadzenArcGauge class="my-gauge">
+                    <RadzenArcGaugeScale Step="10" Min="0" Max="100" Radius="1" TickPosition="GaugeTickPosition.Outside"
+                    Y="0.6" Margin="6">
+                        <RadzenArcGaugeScaleValue Value=@valueWho ShowValue="true">
+                        </RadzenArcGaugeScaleValue>
+                    </RadzenArcGaugeScale>
+                </RadzenArcGauge>
+            </RadzenCard>
+            <RadzenCard Class="m-3 text-center" style="width: 25rem; height: 20rem;">
+                <RadzenText TextStyle="TextStyle.DisplayH6">Média Produtividade</RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption">Última semana: @lastWeek.startEndString</RadzenText>
+                <RadzenArcGauge>
+                    <RadzenArcGaugeScale Step="10" Min="0" Max="100" Radius="1" TickPosition="GaugeTickPosition.Outside"
+                    Y="0.6" Margin="6">
+                        <RadzenArcGaugeScaleValue Value=@valueProd ShowValue="true">
+                        </RadzenArcGaugeScaleValue>
+                    </RadzenArcGaugeScale>
+                </RadzenArcGauge>
+            </RadzenCard>
+            
+        </div>
+        <div class="row mx-auto">
+            <RadzenCard Class="m-3 text-center" style="width: 25rem; height: 20rem;">
+                <RadzenText TextStyle="TextStyle.DisplayH6">Produtividade Por Pergunta</RadzenText>
+                <div class="row">
+                    <Chart Config="_whoRadarConfig" @ref="_whoRadarChart"></Chart>
+                </div>
+            </RadzenCard>
+            <RadzenCard Class="m-3 text-center" style="width: 25rem; height: 20rem;">
+                <RadzenText TextStyle="TextStyle.DisplayH6">Produtividade Por Pergunta</RadzenText>
+                <div class="row">
+                    <Chart Config="_prodRadarConfig" @ref="_prodRadarChart"></Chart>
+                </div>
+            </RadzenCard>
+        </div>
+    }
+</div>
+
+@code
+{
+    float valueWho => LastWeekMentalHealth();
+    float valueProd => LastWeekProductivity();
+    Week lastWeek => DbMirror.main.listWeeks.Last();
+
+    Chart _prodRadarChart;
+    Chart _whoRadarChart;
+    RadarConfig _prodRadarConfig;
+    RadarConfig _whoRadarConfig;
+
+    protected override void OnInitialized()
+    {
+        DbMirror.main.initalizedAction +=
+        () => OnChanged();
+
+        if(_prodRadarChart == null)  CreateProdRadarChart();
+        if(_whoRadarChart == null)  CreateWhoRadarChart();
+
+        UpdateCharts();
+    }
+
+    public float LastWeekMentalHealth()
+    {
+        List<WhoQuestions> lastWeekQuestionFiltered = DbMirror.main.whoquestions.Where(q => q.week.name ==
+        lastWeek.name).ToList();
+        int sum = 0;
+        foreach (WhoQuestions question in lastWeekQuestionFiltered)
+        {
+            sum += question.FinalPercentProp;
+        }
+        if(sum == 0) return 0;
+        else return sum / lastWeekQuestionFiltered.Count;
+    }
+
+    public float LastWeekProductivity()
+    {
+        List<ProductivityQuestions> lastWeekQuestionFiltered = DbMirror.main.pquestions.Where(q => q.week.name ==
+        lastWeek.name).ToList();
+        int sum = 0;
+        foreach (ProductivityQuestions question in lastWeekQuestionFiltered)
+        {
+            sum += question.FinalPercentProp;
+        }
+        if(sum == 0) return 0;
+        return sum / lastWeekQuestionFiltered.Count;
+    }
+
+    public async void OnChanged()
+    {
+        await InvokeAsync(() =>
+        {
+            Utils.Log("State has change updating index");
+            StateHasChanged();
+
+            UpdateCharts();
+
+            _whoRadarChart.Update();
+            _prodRadarChart.Update();
+        });
+    }
+
+    void UpdateCharts()
+    {
+        CreateDatasetAveragePerquestionProd();
+
+        void CreateDatasetAveragePerquestionProd()
+        {
+            var radarDatasetQuestions = new RadarDataset<float>();
+            radarDatasetQuestions.Label = "Media por Pergunta";
+            radarDatasetQuestions.BorderColor = ColorUtil.FromDrawingColor(Color.Black);
+
+            float sumQuestionValues = 0;
+            int totalCountQuestionSum = 0;
+            for (int q = 0; q < 10; q++)
+            {
+                sumQuestionValues = 0;
+                totalCountQuestionSum = 0;
+                for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+                {
+                    var questionsperweek = DbMirror.main.pquestions.Where(questions => questions.week.name ==
+                    DbMirror.main.listWeeks[i].name).ToList();
+                    for (int c = 0; c < questionsperweek.Count; c++)
+                    {
+                        var singlequestion = questionsperweek[c];
+                        // Get a single question object
+                        sumQuestionValues += singlequestion.questions[q].value;
+                        totalCountQuestionSum += 1;
+                    }
+                }
+                radarDatasetQuestions.Add(sumQuestionValues / totalCountQuestionSum);
+            }
+            _prodRadarConfig.Data.Datasets.Add(radarDatasetQuestions);
+        }
+
+        foreach (User user in DbMirror.main.users)
+        {
+            CreateDatasetAveragePerPersonPerQuestionProd(user);
+        }
+
+        void CreateDatasetAveragePerPersonPerQuestionProd(User user)
+        {
+            var radarDatasetQuestions = new RadarDataset<float>();
+            radarDatasetQuestions.Label = $"Media por Pergunta {user.ShortName}";
+            radarDatasetQuestions.BorderColor = ColorUtil.FromDrawingColor(user.colorPrimary);
+
+            float sumQuestionValues = 0;
+            int totalCountQuestionSum = 0;
+            for (int q = 0; q < 10; q++)
+            {
+                sumQuestionValues = 0;
+                totalCountQuestionSum = 0;
+                for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+                {
+                    var questionsperweek = DbMirror.main.pquestions.Where(questions => questions.week.name ==
+                    DbMirror.main.listWeeks[i].name && questions.authorEmail == user.email).ToList();
+                    for (int c = 0; c < questionsperweek.Count; c++)
+                    {
+                        var singlequestion = questionsperweek[c];
+                        // Get a single question object
+                        sumQuestionValues += singlequestion.questions[q].value;
+                        totalCountQuestionSum += 1;
+                    }
+                }
+                radarDatasetQuestions.Add(sumQuestionValues / totalCountQuestionSum);
+            }
+            _prodRadarConfig.Data.Datasets.Add(radarDatasetQuestions);
+        }
+
+
+        if (_prodRadarChart != null)
+        {
+            _prodRadarChart.Update();
+        }
+
+        ///
+
+        CreateDatasetAveragePerquestionWho();
+
+        void CreateDatasetAveragePerquestionWho()
+        {
+            var radarDatasetQuestions = new RadarDataset<float>();
+            radarDatasetQuestions.Label = "Media por Pergunta";
+            radarDatasetQuestions.BorderColor = ColorUtil.FromDrawingColor(Color.Black);
+
+            float sumQuestionValues = 0;
+            int totalCountQuestionSum = 0;
+            for (int q = 0; q < 5; q++)
+            {
+                sumQuestionValues = 0;
+                totalCountQuestionSum = 0;
+                for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+                {
+                    var questionsperweek = DbMirror.main.whoquestions.Where(questions => questions.week.name ==
+                    DbMirror.main.listWeeks[i].name).ToList();
+                    for (int c = 0; c < questionsperweek.Count; c++)
+                    {
+                        var singlequestion = questionsperweek[c];
+                        // Get a single question object
+                        sumQuestionValues += singlequestion.questions[q].value;
+                        totalCountQuestionSum += 1;
+                    }
+                }
+                radarDatasetQuestions.Add(sumQuestionValues / totalCountQuestionSum);
+            }
+            _whoRadarConfig.Data.Datasets.Add(radarDatasetQuestions);
+        }
+
+        foreach (User user in DbMirror.main.users)
+        {
+            CreateDatasetAveragePerPersonPerQuestionWho(user);
+        }
+
+        void CreateDatasetAveragePerPersonPerQuestionWho(User user)
+        {
+            var radarDatasetQuestions = new RadarDataset<float>();
+            radarDatasetQuestions.Label = $"Media por Pergunta {user.ShortName}";
+            radarDatasetQuestions.BorderColor = ColorUtil.FromDrawingColor(user.colorPrimary);
+
+            float sumQuestionValues = 0;
+            int totalCountQuestionSum = 0;
+            for (int q = 0; q < 5; q++)
+            {
+                sumQuestionValues = 0;
+                totalCountQuestionSum = 0;
+                for (int i = 0; i < DbMirror.main.listWeeks.Count; i++)
+                {
+                    var questionsperweek = DbMirror.main.whoquestions.Where(questions => questions.week.name ==
+                    DbMirror.main.listWeeks[i].name && questions.authorEmail == user.email).ToList();
+                    for (int c = 0; c < questionsperweek.Count; c++)
+                    {
+                        var singlequestion = questionsperweek[c];
+                        // Get a single question object
+                        sumQuestionValues += singlequestion.questions[q].value;
+                        totalCountQuestionSum += 1;
+                    }
+                }
+                radarDatasetQuestions.Add(sumQuestionValues / totalCountQuestionSum);
+            }
+            _whoRadarConfig.Data.Datasets.Add(radarDatasetQuestions);            
+        }
+
+
+        if (_whoRadarChart != null)
+        {
+            _whoRadarChart.Update();
+        }
+    }
+
+    protected void CreateProdRadarChart()
+    {
+        ///
+        _prodRadarConfig = new RadarConfig();
+        for (int i = 0; i < 10; i++)
+        {
+            _prodRadarConfig.Data.Labels.Add($"Q{i + 1}");
+        }
+        _prodRadarConfig.Options = new RadarOptions
+        {
+            Legend = new Legend
+            {
+                Display = true,
+                Position = Position.Right
+            }
+        };
+        _prodRadarConfig.Options.Scale = new LinearRadialAxis
+        {
+            Ticks = new LinearRadialTicks
+            {
+                BeginAtZero = true,
+                Max = 5
+            }
+        };
+        
+    }
+
+    protected void CreateWhoRadarChart()
+    {
+        ///
+        _whoRadarConfig = new RadarConfig();
+        for (int i = 0; i < 5; i++)
+        {
+            _whoRadarConfig.Data.Labels.Add($"Q{i + 1}");
+        }
+        _whoRadarConfig.Options = new RadarOptions
+        {
+            Legend = new Legend
+            {
+                Display = true,
+                Position = Position.Right
+            }
+        };
+        _whoRadarConfig.Options.Scale = new LinearRadialAxis
+        {
+            Ticks = new LinearRadialTicks
+            {
+                BeginAtZero = true,
+                Max = 5
+            }
+        };
+        
+    }
+}

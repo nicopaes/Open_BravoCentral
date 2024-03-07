@@ -1,0 +1,62 @@
+[
+	{
+		"_id": "628e4e603396896d382ca9a3",
+		"name": "C.",
+		"email": "cezar.g.loureiro@gmail.com",
+		"discordid": "222877640518795275",
+		"colorPrimary": "Bisque",
+		"colorSecundary": "OrangeRed",
+		"area": "ART",
+		"anonname": "ART_01"
+	},
+	{
+		"_id": "628e4ec43396896d382ca9a4",
+		"name": "M.",
+		"email": "mtrigsauer@yahoo.com",
+		"discordid": "249958301238820864",
+		"colorPrimary": "RoyalBlue",
+		"colorSecundary": "Goldenrod",		
+		"area": "GD",
+		"anonname": "GD_02"
+	},
+	{
+		"_id": "628ea6ce3396896d382ca9a6",
+		"name": "J.",
+		"email": "joaofiga123@gmail.com",
+		"discordid": "207613618940805122",
+		"colorPrimary": "YellowGreen",
+		"colorSecundary": "SeaGreen",		
+		"area": "ART",
+		"anonname": "ART_02"		
+	},
+	{
+		"_id": "628e4c5f3396896d382ca9a0",
+		"name": "Y.",
+		"email": "yanndemoraes@gmail.com",
+		"discordid": "243512313099976704",
+		"colorPrimary": "Orange",
+		"colorSecundary": "Sienna",		
+		"area": "PROG",
+		"anonname": "PROG_02"
+	},
+	{
+		"_id": "628e4e123396896d382ca9a2",
+		"name": "N.",
+		"email": "nicolaspleme@gmail.com",
+		"discordid": "164580057564577792",
+		"colorPrimary": "Peru",
+		"colorSecundary": "Olive",	
+		"area": "PROG",
+		"anonname": "PROG_01"
+	},
+	{
+		"_id": "628e4efb3396896d382ca9a5",
+		"name": "M.",
+		"email": "mabelmariz@gmail.com",
+		"discordid": "265640103152451585",		
+		"colorPrimary": "DodgerBlue",
+		"colorSecundary": "SkyBlue",		
+		"area": "GD",
+		"anonname": "GD_01"
+	}
+]

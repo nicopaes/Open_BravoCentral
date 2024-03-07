@@ -1,0 +1,110 @@
+@page "/who5/data"
+@using System.Globalization
+@using ChartJs.Blazor
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.Util
+@using Data
+@using System.Drawing
+@inject NavigationManager NavigationManager
+
+<div class="col">
+    <div class="row w-100 text-center">
+        <RadzenCard class="w-100 rz-background-color-base-200 rz-shadow-0 rz-border-radius-3">
+            <RadzenText TextStyle="TextStyle.DisplayH5" class="m-0">Dados de Saúde Mental
+            </RadzenText>
+        </RadzenCard>
+    </div>
+    <div class="row w-100">
+        <RadzenDataGrid AllowFiltering="true" AllowMultiColumnSorting="true" AllowColumnResize="true" AllowAlternatingRows="false"
+            FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="12" AllowPaging="true"
+            PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            Data="@(DbMirror.main.whoquestions as IEnumerable<WhoQuestions>)" TItem="WhoQuestions" ColumnWidth="180px"
+            LogicalFilterOperator="LogicalFilterOperator.Or">
+            <Columns>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title="Nome" Frozen="true"
+                    TextAlign="TextAlign.Center" >
+                    <Template Context="data">
+                        @DbMirror.main.GetNameByEmail(data.AuthorEmail)
+                    </Template>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title="Semana" Frozen="true" TextAlign="TextAlign.Center"
+                    Width=220px>
+                    <Template Context="data">
+                        @data.week.ptbrName
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title=Q1 Frozen="true" TextAlign="TextAlign.Left"
+                    Width=120px Sortable=true Property="Q1">
+                     <Template Context="data">
+                        @if(data.Q1 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q1</span>
+                        }
+                        else
+                        {
+                            @data.Q1
+                        }
+                     </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title=Q2 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=120px Sortable=true Property="Q2">
+                    <Template Context="data">
+                        @if(data.Q2 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q2</span>
+                        }
+                        else
+                        {
+                            @data.Q2
+                        }
+                     </Template>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title=Q3 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=120px Sortable=true Property="Q3">
+                    <Template Context="data">
+                        @if(data.Q3 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q3</span>
+                        }
+                        else
+                        {
+                            @data.Q3
+                        }
+                     </Template>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title=Q4 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=120px Sortable=true Property="Q4">
+                    <Template Context="data">
+                        @if(data.Q4 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q4</span>
+                        }
+                        else
+                        {
+                            @data.Q4
+                        }
+                     </Template>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title=Q5 Frozen="true" TextAlign="TextAlign.Center"
+                    Width=120px Sortable=true Property="Q5">
+                    <Template Context="data">
+                        @if(data.Q5 <= 1)
+                        {
+                            <span style='color: var(--rz-danger-dark)'>@data.Q5</span>
+                        }
+                        else
+                        {
+                            @data.Q5
+                        }
+                     </Template>
+                    </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="WhoQuestions" Title="Porcentagem Final" Frozen="true" TextAlign="TextAlign.Center"
+                    Width=120px Property="FinalPercentProp"/>
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+</div>

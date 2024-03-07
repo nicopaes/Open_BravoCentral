@@ -1,0 +1,14 @@
+@page "/log"
+@using BravoCentral.Data
+
+<div class="w-100 h-100">
+    <RadzenCard class="w-100">
+        @{
+            var array = DbMirror.main.log.ToString().Split('\n');
+        }
+        @for (int i = array.Length/2; i < array.Length; i++)
+        {
+            @array[i] <br />
+        }
+    </RadzenCard>
+</div>

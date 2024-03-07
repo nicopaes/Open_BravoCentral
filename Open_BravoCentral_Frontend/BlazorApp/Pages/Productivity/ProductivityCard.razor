@@ -1,0 +1,118 @@
+@using ChartJs.Blazor
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using ChartJs.Blazor.BarChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.Util
+@using Data
+@using System.Drawing
+
+
+@if (pquestion != null)
+{
+    <RadzenCard Class="m-3" style="width: 15rem;">
+        <div class="d-flex flex-row p-2 mb-0">
+            <div>
+                <RadzenText TextStyle="TextStyle.DisplayH6"><b>@pquestion.week.ptbrName</b>
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption" Class="d-flex mt-0 mb-0">@pquestion.week.startEndString
+                </RadzenText>
+            </div>
+        </div>
+        <RadzenCard Class="my-1 rz-background-color-base-200 rz-shadow-0 rz-border-radius-3"
+        style="margin: 0 calc(-1 * var(--rz-card-padding)); padding: 2rem;">
+            <div class="row">
+                <Chart Config="_config" @ref="_chart"></Chart>
+            </div>
+        </RadzenCard>
+        <div class="d-flex flex-row pt-2 mb-0 ">
+            <RadzenText TextStyle="TextStyle.Subtitle1" class="mx-auto">Total: @this.pquestion.FinalPercent().ToString()
+            </RadzenText>
+        </div>
+    </RadzenCard>
+}
+
+@code
+{
+    [ParameterAttribute]
+    public ProductivityQuestions pquestion { get; set; }
+    //
+    private BarConfig _config;
+    private Chart _chart;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (pquestion == null) return; // Guard clause
+        _config = new BarConfig
+        {
+            Options = new BarOptions
+            {
+                Responsive = true, //TODO Change this to change the size of the chart once it's done
+                Legend = new Legend
+                {
+                    Display = false,
+                    Position = Position.Bottom
+                },
+                Title = new OptionsTitle
+                {
+                    Display = false,
+                },
+                Scales = new BarScales
+                {
+                    YAxes = new List<CartesianAxis>
+                    {
+                        new LinearCartesianAxis
+                        {
+                            Ticks = new LinearCartesianTicks
+                            {
+                                BeginAtZero = true,
+                                Max = 5
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        RefreshChart();
+    }
+
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        RefreshChart();
+    }
+    
+
+    public void RefreshChart()
+    {
+        BarDataset<int> dataset1 = new BarDataset<int>()
+        {
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.MediumSeaGreen),
+            BorderColor = ColorUtil.FromDrawingColor(Color.Black),
+            BorderWidth = 1
+        };
+
+        dataset1.Clear();
+        _config.Data.Labels.Clear();
+
+        for (int i = 0; i < 10; i++)
+        {
+            dataset1.Add(pquestion.questions[i].value);
+            _config.Data.Labels.Add($"Q{i+1}");
+        }
+
+        _config.Data.Datasets.Clear();
+        _config.Data.Datasets.Add(dataset1);
+        
+
+        if(_chart != null)
+        {
+            _chart.Update();
+        }        
+    }
+}
