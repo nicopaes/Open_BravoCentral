@@ -1,0 +1,44 @@
+{
+  "name": "bravocentral",
+  "version": "0.1.0",
+  "description": "Open server for keeping track of mental health and productivity",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js",
+    "register": "node ./src/register.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicopaes/Open_BravoCentral_Backend.git"
+  },
+  "keywords": [
+    "server",
+    "productivity",
+    "mental",
+    "health"
+  ],
+  "author": "Nicolas Paes Leme",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicopaes/BravoCentral/issues"
+  },
+  "homepage": "https://github.com/nicopaes/BravoCentral#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "big-json": "^3.2.0",
+    "dotenv": "^10.0.0",
+    "lowdb": "^3.0.0",
+    "mongoose": "^6.3.3",
+    "node-schedule": "^2.1.1",
+    "restify": "^8.6.0",
+    "restify-clients": "^3.1.0"
+  },
+  "engines": {
+    "node": "16.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
